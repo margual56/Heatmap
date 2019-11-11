@@ -35,7 +35,7 @@
 
       function getdata(anio) {
         var httpr = new XMLHttpRequest();
-        httpr.open("GET", "http://team10.osnola.es/geojson.php?anio=" + anio.toString(),false);
+        httpr.open("GET", "http://127.0.0.1:3000/geojson.php?anio=" + anio.toString(),false);
         httpr.send(null);
         return httpr.responseText;
       }
