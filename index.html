@@ -35,7 +35,7 @@
 
       function getdata(anio) {
         var httpr = new XMLHttpRequest();
-        httpr.open("GET", "http://team10.osnola.es/geojson.php?anio=" + anio.toString(),false);
+        httpr.open("GET", "http://127.0.0.1:3000//geojson.php?anio=" + anio.toString(),false);
         httpr.send(null);
         return httpr.responseText;
       }
@@ -63,7 +63,7 @@
         download();
         loading(false)
         GUI.prototype = new Microsoft.Maps.CustomOverlay({beneathLabels: true, drawOrder: 100});
-          
+
           function GUI() {
 
               var st1 = "margin-left: 1em;margin-right: 1em;margin-top: 0.2em;margin-bottom: 0.2em"
@@ -165,7 +165,7 @@
           map.layers.insert(heatmap);
           console.log("heatmap done");
 
-          
+
 
           setTimeout(updatePrintout(heatmap, 1), 2000);
         });
@@ -185,8 +185,8 @@
         console.log(maxPopulation);
 
         year = sYear.value
-        
-        
+
+
       }
 
       function f(x){
@@ -195,7 +195,7 @@
 
       function download() {
         var s1;
-        
+
 
         for(var i=0; i<finalYear-BASEYEAR+1; i++) {
           s1 = new Date().getTime();
