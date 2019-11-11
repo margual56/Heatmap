@@ -62,8 +62,8 @@
         loading(true)
         download();
         loading(false)
-        GUI.prototype = new Microsoft.Maps.CustomOverlay({beneathLabels: true, drawOrder: 100});
-          
+        /*GUI.prototype = new Microsoft.Maps.CustomOverlay({beneathLabels: true, drawOrder: 100});
+
           function GUI() {
 
               var st1 = "margin-left: 1em;margin-right: 1em;margin-top: 0.2em;margin-bottom: 0.2em"
@@ -151,7 +151,8 @@
               this.setHtmlElement(c)
           }
           var g = new GUI();
-          map.layers.insert(g);
+          map.layers.insert(g);*/
+
         Microsoft.Maps.loadModule(['Microsoft.Maps.GeoJson', 'Microsoft.Maps.HeatMap'], function () {
           let shapes = [new Microsoft.Maps.Location(0,0)];
           var heatmap = new Microsoft.Maps.HeatMapLayer(shapes,
@@ -165,12 +166,11 @@
           map.layers.insert(heatmap);
           console.log("heatmap done");
 
-          
-
           setTimeout(updatePrintout(heatmap, 1), 2000);
         });
       }
 
+      /*
       function pauseUpdates() {
         yearIntervalOld = yearInterval
         yearInterval = 0;
@@ -185,9 +185,7 @@
         console.log(maxPopulation);
 
         year = sYear.value
-        
-        
-      }
+      }*/
 
       function f(x){
         return Math.pow(x, 4)/1500000000+100;
@@ -195,7 +193,7 @@
 
       function download() {
         var s1;
-        
+
 
         for(var i=0; i<finalYear-BASEYEAR+1; i++) {
           s1 = new Date().getTime();
@@ -214,7 +212,7 @@
 
           if(year+yearInterval<finalYear-yearInterval*2){
             year = year+yearInterval
-            document.getElementById("sYear").value = year;
+            //document.getElementById("sYear").value = year;
             updatePrintout(heatmap, delay);
           }
           else {
