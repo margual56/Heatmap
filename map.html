@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8" />
+    <link href="/_styles/normalize.css" rel="stylesheet" type="text/css">
+    <style type="text/css">
+        #spAnio {color:white; font-weight: bold;}
+        #overlay {color:black; font-weight: bold;}
+    </style>
+	<script type='text/javascript'>
+    var map, searchManager, heatmap;
+    var anio=1996;
+    setInterval(function(){
+        document.getElementById('spAnio').innerHTML=anio;
+    }, 100);
+
+    function loading(visible) {
+        if (visible) {
+            document.getElementById('overlay').style.display="block";
+        } else {
+            document.getElementById('overlay').style.display="none";
+        }
+    }
+    function insertHeatmap(anio) {
+        var locationData;
+        var Http = new XMLHttpRequest();
+        //const url='http://team10.osnola.es/geojson.php?poblacion=leon&anio=2018';
+        var url='http://team10.osnola.es/geojson.php?anio='+anio;
+        Http.open("GET", url);
+        Http.send();
+        loading(true);
+        Http.onreadystatechange = function(e) {
+            if (this.readyState==4 && this.status==200) {
+                var locs = [
+                    //new Microsoft.Maps.Location(40.098388671875, -4.043139934539795),
+                    //new Microsoft.Maps.Location(40.098388671879, -4.043139934539791)
+                ];
+
+                //console.log(Http.responseText);
+                locationData=JSON.parse(Http.responseText);
+                if (locationData.features.length==0) {nextYear();}
+
+                locationData.features.forEach(function(element) {
+                    //console.log(element);
+                    var peso=element.properties.habitantes;
+                    do {
+                        var lat=parseFloat(element.geometry.coordinates[1].replace(/,/g, '.'));
+                        var lng=parseFloat(element.geometry.coordinates[0].replace(/,/g, '.'));
+                        /*if (peso>element.properties.habitantes/4) {
+                            var rndLat=Math.random()/10;
+                            var rndLng=Math.random()/10;
+                            if (Math.random()*2>1) {
+                                lat+=rndLat;
+                                lng+=rndLng;
+                            } else {
+                                lat-=rndLat;
+                                lng-=rndLng;
+                            }
+                        }*/
+                        //console.log(lat);
+                        //console.log(lng);
+                        locs.push(new Microsoft.Maps.Location(lat, lng));
+                        peso=peso-5000;
+                        //console.log(peso);
+                    }
+                    while (peso>0);
+                });
+                //console.log(locs);
+
+                //Load the HeatMap module.
+                //Microsoft.Maps.loadModule('Microsoft.Maps.HeatMap', function () {
+                Microsoft.Maps.loadModule(['Microsoft.Maps.GeoJson', 'Microsoft.Maps.HeatMap'], function () {
+                    heatmap = new Microsoft.Maps.HeatMapLayer(locs, {
+                        intensity: 0.75,
+                        radius: 10000,
+                        opacity: 0.75,
+                        unit: 'meters', 
+                        colorGradient: {
+                            '0': 'Navy',
+                            '0.25': 'Blue',
+                            '0.5': 'Green',
+                            '0.75': 'Yellow',
+                            '1': 'Red'
+                        }
+                    });
+                    map.layers.insert(heatmap);
+                    /*
+                    Microsoft.Maps.GeoJson.readFromUrl('http://team10.osnola.es/geojson.php?anio=2018', function (shapes) {
+                        console.log('readFromUrl');
+                        console.log(shapes);
+                        var heatMap = new Microsoft.Maps.HeatMapLayer(shapes, {
+                            intensity: 0.75,
+                            radius: 2500,
+                            opacity: 0.75,
+                            unit: 'meters', 
+                            colorGradient: {
+                                '0': 'Navy',
+                                '0.25': 'Blue',
+                                '0.5': 'Green',
+                                '0.75': 'Yellow',
+                                '1': 'Red'
+                            },
+
+                            propertyAsWeight: 'mag',
+                        });
+                        map.layers.insert(heatMap);
+                    });
+                    */
+
+                });
+                loading(false);
+            }
+        }
+    }
+
+    function removeHeatmap() {
+        map.layers.remove(heatmap);
+    }
+
+    function nextYear() {
+        map.layers.remove(heatmap);
+        insertHeatmap(++anio);
+    }
+
+    function prevYear() {
+        map.layers.remove(heatmap);
+        insertHeatmap(--anio);
+    }
+
+    function play() {
+        anio=1996;
+        for (var i = 1996; i < 2018; i++) {
+            setTimeout(nextYear(),5000);
+        }
+    }
+
+    function GetMap() {
+        map = new Microsoft.Maps.Map('#myMap', {
+            credentials: 'AhDgOTA-iLKJ8ovYzesQjwB1wPIoyEYUjf6rj8wp6290h8BoHoTVSajFChVkFQV6',
+            mapTypeId: Microsoft.Maps.MapTypeId.aerial,
+            //center: new Microsoft.Maps.Location(40.098388671875, -4.043139934539795),
+            //center: new Microsoft.Maps.Location(42.600029, -5.5703201),//León
+            center: new Microsoft.Maps.Location(42.5989995, -5.5682413),//León
+            zoom: 6
+        });
+        //Generate a 50,000 random locations that are within the bounds of the map view.
+        //var locs = Microsoft.Maps.TestDataGenerator.getLocations(2, map.getBounds());
+
+        insertHeatmap(1996);
+        //geocodeQuery("León, España");
+    }
+
+    function geocodeQuery(query) {
+        //If search manager is not defined, load the search module.
+        if (!searchManager) {
+            //Create an instance of the search manager and call the geocodeQuery function again.
+            Microsoft.Maps.loadModule('Microsoft.Maps.Search', function () {
+                searchManager = new Microsoft.Maps.Search.SearchManager(map);
+                geocodeQuery(query);
+            });
+        } else {
+            var searchRequest = {
+                where: query,
+                callback: function (r) {
+                    //Add the first result to the map and zoom into it.
+                    if (r && r.results && r.results.length > 0) {
+                        var pin = new Microsoft.Maps.Pushpin(r.results[0].location);
+                        map.entities.push(pin);
+
+                        map.setView({ bounds: r.results[0].bestView });
+                    }
+                },
+                errorCallback: function (e) {
+                    //If there is an error, alert the user about it.
+                    alert("No results found.");
+                }
+            };
+
+            //Make the geocode request.
+            searchManager.geocode(searchRequest);
+        }
+    }
+    </script>
+    <script type='text/javascript' src='http://www.bing.com/api/maps/mapcontrol?callback=GetMap' async defer></script>
+</head>
+<body>
+    <div id="myMap" style="position:relative;width:100%;height:100%;"></div>
+    <div style="position:absolute;">
+        <button  onclick="prevYear()">&lt;</button>
+        <span id="spAnio"></span>
+        <button onclick="nextYear()">&gt;</button>
+        <!--<button onclick="play()">&gt;&gt;</button>-->
+    </div>
+    <div id="overlay" style="position:absolute;width:100%;height:100%; background-color: white; opacity:0.73; text-align: center;">
+        <br /><br /><br /><br /><br />
+        Loading...
+    </div>
+</body>
+</html>
