@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-{"type" : "FeatureCollection","Features" : []}
-=======
 {
 	"type" : "FeatureCollection",
 	"Features" : [
@@ -129031,4 +129028,3 @@
 		}
 	]
 }
->>>>>>> noGUI
