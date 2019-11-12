@@ -5,6 +5,7 @@
     <meta charset="utf-8" />
     <link href="/_styles/normalize.css" rel="stylesheet" type="text/css">
     <meta name="viewport" content="width=device-width">
+    <script type='text/javascript' src='jquery-3.4.1.min.js'></script>
     <script type='text/javascript'>
       let BASEYEAR = 1998;
 
@@ -34,10 +35,15 @@
       }
 
       function getdata(anio) {
-        var httpr = new XMLHttpRequest();
-        httpr.open("GET", "http://127.0.0.1:3000/geojson.php?anio=" + anio.toString(),false);
-        httpr.send(null);
-        return httpr.responseText;
+        let data = jQuery.ajax({
+          type: 'POST',
+          url: 'file://geojson.php?anio=' + anio.toString(),
+          dataType: 'json'
+        }).done(function(data) {
+          console.log(data);
+        });
+
+        return data;
       }
 
       function lerp(a, b, f){
@@ -197,6 +203,7 @@
 
         for(var i=0; i<finalYear-BASEYEAR+1; i++) {
           s1 = new Date().getTime();
+          console.log(getdata(BASEYEAR+i));
           yearsdata.push(JSON.parse(getdata(BASEYEAR+i)));
           console.log("loaded " + (BASEYEAR+i).toString() + " in " + ((new Date().getTime()-s1)/1000).toString() + "s");
         }
