@@ -36,11 +36,7 @@
 
       function getdata(year){
         var httpr = new XMLHttpRequest();
-<<<<<<< HEAD
-        httpr.open("GET", "http://127.0.0.1:3000//geojson.php?anio=" + anio.toString(),false);
-=======
         httpr.open("GET", "INEdata/Poblacion" + year + ".json", false);
->>>>>>> noGUI
         httpr.send(null);
         return JSON.parse(httpr.responseText);
       }
@@ -66,74 +62,6 @@
         loading(true)
         download();
         loading(false)
-<<<<<<< HEAD
-        GUI.prototype = new Microsoft.Maps.CustomOverlay({beneathLabels: true, drawOrder: 100});
-
-          function GUI() {
-
-              var st1 = "margin-left: 1em;margin-right: 1em;margin-top: 0.2em;margin-bottom: 0.2em"
-              var st2 = "color:white;margin-left: 1em;margin-right: 0.1em;margin-top: 0.2em;margin-bottom: 0.2em"
-              this.sSpeed = document.createElement("input")
-              this.sSpeed.type = "range"
-              this.sSpeed.id = "sSpeed"
-              this.sSpeed.step = 1
-              this.sSpeed.style = st1;
-
-              this.sYear = document.createElement("input")
-              this.sYear.type = "range"
-              this.sYear.id = "sYear"
-              this.sYear.max = finalYear
-              this.sYear.min = BASEYEAR
-              this.sYear.value = BASEYEAR
-              this.sYear.step = 0.25
-              this.sYear.style = st1;
-
-              this.sPop = document.createElement("input")
-              this.sPop.type = "range"
-              this.sPop.id = "sPop"
-              this.sPop.max = 1000
-              this.sPop.value = maxPopulation
-              this.sPop.step = 1
-              this.sPop.style = st1;
-
-              this.rBoxT = document.createElement("input");
-              this.rBoxT.type = "radio"
-              this.rBoxT.checked = true;
-              this.rBoxT.id = "total"
-              this.rBoxT.name = "sex"
-              this.rBoxT.value = "total"
-              this.rBoxT.style = st1;
-
-              this.lBoxT = document.createElement("label");
-              this.lBoxT.for = "total"
-              this.lBoxT.innerText = "Total"
-              this.lBoxT.style = st2;
-
-              this.rBoxH = document.createElement("input");
-              this.rBoxH.type = "radio"
-              this.rBoxH.id = "homb"
-              this.rBoxH.name = "sex"
-              this.rBoxH.value = "homb"
-              this.rBoxH.style = st1;
-
-              this.lBoxH = document.createElement("label");
-              this.lBoxH.for = "homb"
-              this.lBoxH.innerText = "Hombres"
-              this.lBoxH.style = st2;
-
-              this.rBoxF = document.createElement("input");
-              this.rBoxF.type = "radio"
-              this.rBoxF.id = "muj"
-              this.rBoxF.name = "sex"
-              this.rBoxF.value = "muj"
-              this.rBoxF.style = st1;
-
-              this.lBoxF = document.createElement("label");
-              this.lBoxF.for = "muj"
-              this.lBoxF.innerText = "Mujeres"
-              this.lBoxF.style = st2;
-=======
->>>>>>> noGUI
 
         Microsoft.Maps.loadModule(['Microsoft.Maps.GeoJson', 'Microsoft.Maps.HeatMap'], function () {
           let shapes = [new Microsoft.Maps.Location(0,0)];
@@ -148,47 +76,16 @@
           map.layers.insert(heatmap);
           console.log("heatmap done");
 
-<<<<<<< HEAD
-
-
-=======
->>>>>>> noGUI
           setTimeout(updatePrintout(heatmap, 1), 2000);
         });
       }
 
-<<<<<<< HEAD
-      function pauseUpdates() {
-        yearIntervalOld = yearInterval
-        yearInterval = 0;
-      }
-
-      function updateGUIConfig(){
-        var sSpeed = document.getElementById("sSpeed")
-        var sYear = document.getElementById("sYear")
-        var sPop = document.getElementById("sPop")
-        maxPopulation = sPop.value
-        yearInterval = yearIntervalOld
-        console.log(maxPopulation);
-
-        year = sYear.value
-
-
-      }
-
-=======
->>>>>>> noGUI
       function f(x){
         return Math.pow(x, 4)/1500000000+100;
       }
 
       function download() {
         var s1;
-<<<<<<< HEAD
-
-
-=======
->>>>>>> noGUI
         for(var i=0; i<finalYear-BASEYEAR+1; i++) {
           s1 = new Date().getTime();
           yearsdata.push(getdata(BASEYEAR+i));
