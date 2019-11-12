@@ -5,19 +5,26 @@
     <meta charset="utf-8" />
     <link href="/_styles/normalize.css" rel="stylesheet" type="text/css">
     <meta name="viewport" content="width=device-width">
+    <script type='text/javascript' src='jquery-3.4.1.min.js'></script>
     <script type='text/javascript'>
-      let BASEYEAR = 1998;
+
+      let BASEYEAR = 1999;
+      let finalYear = 2018;
 
       let year = BASEYEAR;
-      let finalYear = 2010;
       let yearInterval = 0.1;
       let yearIntervalOld = 0.1;
       let maxPopulation = 400;
 
-      let yearsdata = [];
+      /*
+        gender = 0 -> total
+        gender = 1 -> men
+        gender = 2 -> woman
+      */
+      let gender = 0;
 
+      let yearsdata = [];
       let yearscount = BASEYEAR;
-      const locations = JSON.parse(getphp());
 
       function loading(visible) {
         if (visible) {
@@ -25,19 +32,17 @@
         } else {
             document.getElementById('overlay').style.display="none";
         }
-    }
-      function getphp() {
-        var httpr = new XMLHttpRequest();
-        httpr.open("GET", "locations.json",false);
-        httpr.send(null);
-        return httpr.responseText;
       }
 
-      function getdata(anio) {
+      function getdata(year){
         var httpr = new XMLHttpRequest();
+<<<<<<< HEAD
         httpr.open("GET", "http://127.0.0.1:3000//geojson.php?anio=" + anio.toString(),false);
+=======
+        httpr.open("GET", "INEdata/Poblacion" + year + ".json", false);
+>>>>>>> noGUI
         httpr.send(null);
-        return httpr.responseText;
+        return JSON.parse(httpr.responseText);
       }
 
       function lerp(a, b, f){
@@ -45,8 +50,6 @@
       }
 
       function GetMap() {
-        let data = JSON.parse(getphp());
-
         let pos = [40.098388671875, -4.043139934539795];
         var map = new Microsoft.Maps.Map('#myMap', {
           credentials: "AhDgOTA-iLKJ8ovYzesQjwB1wPIoyEYUjf6rj8wp6290h8BoHoTVSajFChVkFQV6",
@@ -59,9 +62,11 @@
             "liteMode": true
           }
         });
+
         loading(true)
         download();
         loading(false)
+<<<<<<< HEAD
         GUI.prototype = new Microsoft.Maps.CustomOverlay({beneathLabels: true, drawOrder: 100});
 
           function GUI() {
@@ -127,31 +132,9 @@
               this.lBoxF.for = "muj"
               this.lBoxF.innerText = "Mujeres"
               this.lBoxF.style = st2;
+=======
+>>>>>>> noGUI
 
-
-          }
-
-          GUI.prototype.onAdd = function() {
-              var c = document.createElement("div")
-              c.style = "background: rgba(200,54,54,0.5);position: absolute; overflow: hidden; transform: scale(1); z-index: 20100;"
-              c.onmouseup = updateGUIConfig
-              c.onmousedown = pauseUpdates
-              c.appendChild(this.sSpeed)
-              c.appendChild(this.sYear)
-              c.appendChild(this.sPop)
-              c.appendChild(this.rBoxT)
-              c.appendChild(this.lBoxT)
-              c.appendChild(document.createElement("br"))
-              c.appendChild(this.rBoxH)
-              c.appendChild(this.lBoxH)
-              c.appendChild(document.createElement("br"))
-              c.appendChild(this.rBoxF)
-              c.appendChild(this.lBoxF)
-              c.appendChild(document.createElement("br"))
-              this.setHtmlElement(c)
-          }
-          var g = new GUI();
-          map.layers.insert(g);
         Microsoft.Maps.loadModule(['Microsoft.Maps.GeoJson', 'Microsoft.Maps.HeatMap'], function () {
           let shapes = [new Microsoft.Maps.Location(0,0)];
           var heatmap = new Microsoft.Maps.HeatMapLayer(shapes,
@@ -165,12 +148,16 @@
           map.layers.insert(heatmap);
           console.log("heatmap done");
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> noGUI
           setTimeout(updatePrintout(heatmap, 1), 2000);
         });
       }
 
+<<<<<<< HEAD
       function pauseUpdates() {
         yearIntervalOld = yearInterval
         yearInterval = 0;
@@ -189,21 +176,27 @@
 
       }
 
+=======
+>>>>>>> noGUI
       function f(x){
         return Math.pow(x, 4)/1500000000+100;
       }
 
       function download() {
         var s1;
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> noGUI
         for(var i=0; i<finalYear-BASEYEAR+1; i++) {
           s1 = new Date().getTime();
-          yearsdata.push(JSON.parse(getdata(BASEYEAR+i)));
+          yearsdata.push(getdata(BASEYEAR+i));
           console.log("loaded " + (BASEYEAR+i).toString() + " in " + ((new Date().getTime()-s1)/1000).toString() + "s");
         }
-      }
 
+        console.log(yearsdata)
+      }
 
       function updatePrintout(heatmap, delay){
         setTimeout(function () {
@@ -214,7 +207,6 @@
 
           if(year+yearInterval<finalYear-yearInterval*2){
             year = year+yearInterval
-            document.getElementById("sYear").value = year;
             updatePrintout(heatmap, delay);
           }
           else {
@@ -225,32 +217,48 @@
       }
 
       function getLocations3(yearf) {
-        var y1 = Math.floor(yearf);
-        var y2 = Math.ceil(yearf);
-        var pp = [];
+        let mag;
+        switch (gender) {
+          case 0:
+            mag = "total";
+          break;
+
+          case 1:
+            mag = "hombres";
+          break;
+
+          case 2:
+            mag = "mujeres";
+          break;
+
+          default:
+            mag = "total";
+        }
+
+        let y1 = Math.floor(yearf);
+        let y2 = Math.ceil(yearf);
+        let pp = [];
 
         let features1 = yearsdata[y1-BASEYEAR];
         let features2 = yearsdata[y2-BASEYEAR];
 
         if(typeof features1 === 'undefined' || typeof features2 === 'undefined'){
-          return;
+          return [];
         }
 
-        let element1, element2;
-        for(let j = 0; j<features1["features"].length && j<features2["features"].length; j++) {
-          element1 = features1["features"][j];
-          element2 = features2["features"][j];
+        let element1, element2, x;
+        for(let j = 0; j<features1["Features"].length && j<features2["Features"].length; j++) {
+          element1 = features1["Features"][j];
+          element2 = features2["Features"][j];
 
-          pp.push([lerp(element1["properties"]["mag"].replace(".", ""), element2["properties"]["mag"].replace(".", ""), yearf%1), element1["geometry"]["coordinates"].map(function(x){return x.replace(',', '.')})]);
-        }
+          population = lerp(element1["properties"][mag], element2["properties"][mag], yearf%1);
+          coordinates = element1["geometry"]["coordinates"];
 
-        var points = [];
-        for(let j = 0; j<pp.length; j++) {
-          let x = maxPopulation;
+          x = maxPopulation;
 
           for(let i=5; i>=0; i--) {
-            if(pp[j][0]<x) {
-              points.push(new Microsoft.Maps.Location(parseFloat(pp[j][1][1]) + 0.0001*(Math.random()-0.5),parseFloat(pp[j][1][0]) + 0.0001*(Math.random()-0.5)));
+            if(population<x) {
+              pp.push(new Microsoft.Maps.Location(parseFloat(coordinates[0]) + 0.0001*(Math.random()-0.5),parseFloat(coordinates[1]) + 0.0001*(Math.random()-0.5)));
               x = f(x);
             }else {
               break;
@@ -258,7 +266,7 @@
           }
         }
 
-        return points;
+        return pp;
       }
     </script>
     <script type='text/javascript' src='http://www.bing.com/api/maps/mapcontrol?callback=GetMap' async defer></script>
