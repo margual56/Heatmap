@@ -7,10 +7,11 @@
     <meta name="viewport" content="width=device-width">
     <script type='text/javascript' src='jquery-3.4.1.min.js'></script>
     <script type='text/javascript'>
-      let BASEYEAR = 1998;
+
+      let BASEYEAR = 1999;
+      let finalYear = 2018;
 
       let year = BASEYEAR;
-      let finalYear = 2010;
       let yearInterval = 0.1;
       let yearIntervalOld = 0.1;
       let maxPopulation = 400;
@@ -34,7 +35,10 @@
       }
 
       function getdata(year){
-        return JSON.parse('INEdata/Poblacion' + year + '.json');
+        var httpr = new XMLHttpRequest();
+        httpr.open("GET", "INEdata/Poblacion" + year + ".json", false);
+        httpr.send(null);
+        return JSON.parse(httpr.responseText);
       }
 
       function lerp(a, b, f){
@@ -87,6 +91,8 @@
           yearsdata.push(getdata(BASEYEAR+i));
           console.log("loaded " + (BASEYEAR+i).toString() + " in " + ((new Date().getTime()-s1)/1000).toString() + "s");
         }
+
+        console.log(yearsdata)
       }
 
       function updatePrintout(heatmap, delay){
@@ -138,9 +144,9 @@
         }
 
         let element1, element2, x;
-        for(let j = 0; j<features1["features"].length && j<features2["features"].length; j++) {
-          element1 = features1["features"][j];
-          element2 = features2["features"][j];
+        for(let j = 0; j<features1["Features"].length && j<features2["Features"].length; j++) {
+          element1 = features1["Features"][j];
+          element2 = features2["Features"][j];
 
           population = lerp(element1["properties"][mag], element2["properties"][mag], yearf%1);
           coordinates = element1["geometry"]["coordinates"];
@@ -148,7 +154,7 @@
           x = maxPopulation;
 
           for(let i=5; i>=0; i--) {
-            if(pp[j][0]<x) {
+            if(population<x) {
               pp.push(new Microsoft.Maps.Location(parseFloat(coordinates[0]) + 0.0001*(Math.random()-0.5),parseFloat(coordinates[1]) + 0.0001*(Math.random()-0.5)));
               x = f(x);
             }else {
