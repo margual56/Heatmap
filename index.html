@@ -26,12 +26,20 @@
       let yearsdata = [];
       let yearscount = BASEYEAR;
 
+      let months = [ "January", "February", "March", "April", "May", "June",
+           "July", "August", "September", "October", "November", "December" ];
+
       function loading(visible) {
         if (visible) {
-            document.getElementById('overlay').style.display="block";
+            document.getElementById('loadingOverlay').style.display="block";
         } else {
-            document.getElementById('overlay').style.display="none";
+            document.getElementById('loadingOverlay').style.display="none";
         }
+      }
+
+      function updateOverlayYear(y){
+        var myDiv = document.getElementById("infoOverlay");
+        myDiv.innerHTML = months[Math.floor(12*(y%1)).toString()] + ", " + Math.floor(y).toString();
       }
 
       function getdata(year){
@@ -92,8 +100,6 @@
           yearsdata.push(getdata(BASEYEAR+i));
           console.log("loaded " + (BASEYEAR+i).toString() + " in " + ((new Date().getTime()-s1)/1000).toString() + "s");
         }
-
-        console.log(yearsdata)
       }
 
       function updatePrintout(heatmap, delay){
@@ -102,6 +108,8 @@
           let s1 = new Date().getTime();
           heatmap.setLocations(getLocations3(year));
           //console.log("The year " + time + " computed in: " + ((new Date().getTime()-s1)/1000).toString() + "s");
+
+          updateOverlayYear(year);
 
           if(year+yearInterval<finalYear-yearInterval*2){
             year = year+yearInterval
@@ -171,9 +179,12 @@
 </head>
 <body>
     <div id="myMap"></div>
-    <div id="overlay" style="color:black; font-weight: bold;position:absolute;width:100%;height:100%; background-color: white; opacity:0.73; text-align: center;">
+    <div id="loadingOverlay" style="color:black; font-weight: bold;position:absolute;width:100%;height:100%; background-color: white; opacity:0.73; text-align: center;">
         <br /><br /><br /><br /><br />
         Loading...
+    </div>
+    <div id="infoOverlay">
+      Year:
     </div>
 </body>
 </html>
