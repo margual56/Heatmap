@@ -59,7 +59,8 @@
         let pos = [40.098388671875, -4.043139934539795];
         var map = new Microsoft.Maps.Map('#myMap', {
           credentials: "AhDgOTA-iLKJ8ovYzesQjwB1wPIoyEYUjf6rj8wp6290h8BoHoTVSajFChVkFQV6",
-          mapTypeId: Microsoft.Maps.MapTypeId.aerial,
+          mapTypeId: Microsoft.Maps.MapTypeId.canvasDark,
+          labelOverlay: Microsoft.Maps.LabelOverlay.hidden,
           center: new Microsoft.Maps.Location(pos[0],pos[1]),
           zoom: 7,
           options: {
