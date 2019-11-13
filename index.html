@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>La España despoblada: heatmap</title>
+    <title>La Españita despoblada: heatmap</title>
     <meta charset="utf-8" />
     <link href="/_styles/normalize.css" rel="stylesheet" type="text/css">
     <meta name="viewport" content="width=device-width">
@@ -12,7 +12,7 @@
       let finalYear = 2018;
 
       let year = BASEYEAR;
-      let yearInterval = 0.01;
+      let yearInterval = 0.1;
       let yearIntervalOld = 0.1;
       let maxPopulation = 400;
 
@@ -39,7 +39,9 @@
 
       function updateOverlayYear(y){
         var myDiv = document.getElementById("infoOverlay");
-        myDiv.innerHTML = months[Math.floor(12*(y%1)).toString()] + ", " + Math.floor(y).toString();
+        let date = months[Math.floor(12*(y%1)).toString()] + ", " + Math.floor(y).toString();
+
+        myDiv.innerHTML = date + "\n<progress id=\"progressBar\" max=\"100\" value=" + (100*(y-BASEYEAR)/(finalYear-BASEYEAR)).toString() + "></progress>";
       }
 
       function getdata(year){
@@ -179,12 +181,12 @@
 </head>
 <body>
     <div id="myMap"></div>
-    <div id="loadingOverlay" style="color:black; font-weight: bold;position:absolute;width:100%;height:100%; background-color: white; opacity:0.73; text-align: center;">
+    <div id="loadingOverlay">
         <br /><br /><br /><br /><br />
         Loading...
     </div>
     <div id="infoOverlay">
-      Year:
+      <progress id="progressBar" max="100" value="0"></progress>
     </div>
 </body>
 </html>

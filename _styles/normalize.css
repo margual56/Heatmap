@@ -3,10 +3,12 @@
 #infoOverlay{
   position: absolute;
   width:200px;
-  height:30px;
+  height:60px;
 
-  background-color:rgba(0, 0, 0, 0.5);
-  border: 3px;
+  background-color:rgba(0, 0, 0, 0.75);
+  border: 5px;
+  border-color: #fc6b03;
+  border-style: groove;
 
   margin-left: 5px;
   margin-top: 10px;
@@ -31,6 +33,54 @@
   padding-left: 10px;
   padding-top: 7.5px;*/
 }
+
+#loadingOverlay{
+  color:black;
+  font-weight: bold;
+  position:absolute;
+  width:100%;
+  height:100%;
+  background-color: white;
+  opacity:0.73;
+  text-align: center;
+}
+
+progress {
+	display:inline-block;
+	width:190px;
+	height:20px;
+	padding:15px 0 0 0;
+	margin:0;
+	background:none;
+	border: 0;
+	border-radius: 15px;
+	text-align: left;
+	position:relative;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 0.8em;
+}
+progress::-webkit-progress-bar {
+	height:11px;
+	width:150px;
+	margin:0 auto;
+	background-color: #CCC;
+	box-shadow:-3px 2px 4px #333 inset;
+}
+progress::-webkit-progress-value {
+	display:inline-block;
+	float:left;
+	height:11px;
+	margin:0px -10px 0 0;
+	background: #F70;
+}
+/*
+progress:after {
+	margin:-26px 0 0 -7px;
+	padding:0;
+	display:inline-block;
+	float:left;
+	content: attr(value) '%';
+}*/
 
 html{
   font-family:sans-serif;
