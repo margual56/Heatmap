@@ -12,7 +12,7 @@
       let finalYear = 2018;
 
       let year = BASEYEAR;
-      let yearInterval = 0.01;
+      let yearInterval = 0.082;
       let yearIntervalOld = 0.1;
       let maxPopulation = 400;
 
@@ -96,7 +96,7 @@
           map.layers.insert(heatmap);
           console.log("heatmap done");
 
-          setTimeout(function(){updatePrintout(heatmap, 1);}, 1000);
+          setTimeout(function(){updatePrintout(heatmap, 80);}, 1000);
 
         });
       }
@@ -116,7 +116,7 @@
 
       function updatePrintout(heatmap, delay){
         setTimeout(function () {
-          //let s1 = new Date().getTime();
+          let s1 = new Date().getTime();
           getLocations3(year).then(function(x) {
             let points = []
 
@@ -127,7 +127,7 @@
             heatmap.setLocations(points);
           });
 
-          //console.log("The year " + year + " computed in: " + ((new Date().getTime()-s1)/1000).toString() + "s");
+          console.log("The year " + year + " computed in: " + ((new Date().getTime()-s1)/1000).toString() + "s");
 
           updateOverlayYear(year);
 
@@ -138,13 +138,12 @@
           }
 
           updatePrintout(heatmap, delay);
-        }, 1);
+        }, delay);
       }
 
-      function getNumberPoints(element1, element2, mag, yearf){
+      function getNumberPoints(element1, element2, population, yearf){
 
         let pp = [];
-        let population = lerp(element1["properties"][mag], element2["properties"][mag], yearf%1);
         let coordinates = element1["geometry"]["coordinates"];
 
         let x = maxPopulation;
@@ -158,7 +157,7 @@
           }
         }
 
-        return pp;//new Promise(resolve => {resolve(pp);});
+        return pp;
       }
 
       async function getLocations3(yearf) {
@@ -193,7 +192,11 @@
         let element1 = features1["Features"];
         let element2 = features2["Features"];
         for(let j = 0; j<element1.length && j<element2.length; j++) {
-          promises.push(getNumberPoints(element1[j], element2[j], mag, yearf));
+          let population = lerp(element1[j]["properties"][mag], element2[j]["properties"][mag], yearf%1);
+
+          if(population<=maxPopulation){
+            promises.push(getNumberPoints(element1[j], element2[j], population, yearf));
+          }
         }
 
         return Promise.all(promises);
