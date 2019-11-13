@@ -116,7 +116,7 @@
 
       function updatePrintout(heatmap, delay){
         setTimeout(function () {
-          let s1 = new Date().getTime();
+          //let s1 = new Date().getTime();
           getLocations3(year).then(function(x) {
             let points = []
 
@@ -127,7 +127,7 @@
             heatmap.setLocations(points);
           });
 
-          console.log("The year " + year + " computed in: " + ((new Date().getTime()-s1)/1000).toString() + "s");
+          //console.log("The year " + year + " computed in: " + ((new Date().getTime()-s1)/1000).toString() + "s");
 
           updateOverlayYear(year);
 
