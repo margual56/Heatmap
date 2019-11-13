@@ -12,7 +12,7 @@
       let finalYear = 2018;
 
       let year = BASEYEAR;
-      let yearInterval = 0.1;
+      let yearInterval = 0.01;
       let yearIntervalOld = 0.1;
       let maxPopulation = 400;
 
@@ -34,6 +34,14 @@
             document.getElementById('loadingOverlay').style.display="block";
         } else {
             document.getElementById('loadingOverlay').style.display="none";
+        }
+      }
+
+      function info(visible) {
+        if (visible) {
+            document.getElementById('infoOverlay').style.display="block";
+        } else {
+            document.getElementById('infoOverlay').style.display="none";
         }
       }
 
@@ -88,7 +96,8 @@
           map.layers.insert(heatmap);
           console.log("heatmap done");
 
-          setTimeout(updatePrintout(heatmap, 1), 2000);
+          setTimeout(function(){updatePrintout(heatmap, 1);}, 1000);
+
         });
       }
 
@@ -107,25 +116,52 @@
 
       function updatePrintout(heatmap, delay){
         setTimeout(function () {
-          //console.log("Year" + time);
-          let s1 = new Date().getTime();
-          heatmap.setLocations(getLocations3(year));
-          //console.log("The year " + time + " computed in: " + ((new Date().getTime()-s1)/1000).toString() + "s");
+          //let s1 = new Date().getTime();
+          getLocations3(year).then(function(x) {
+            let points = []
+
+            for(let i = 0; i<x.length; i++){
+              points = points.concat(x[i]);
+            }
+
+            heatmap.setLocations(points);
+          });
+
+          //console.log("The year " + year + " computed in: " + ((new Date().getTime()-s1)/1000).toString() + "s");
 
           updateOverlayYear(year);
 
           if(year+yearInterval<finalYear-yearInterval*2){
             year = year+yearInterval
-            updatePrintout(heatmap, delay);
-          }
-          else {
+          }else {
             year = BASEYEAR
-            updatePrintout(heatmap, delay);
           }
-        }, delay);
+
+          updatePrintout(heatmap, delay);
+        }, 1);
       }
 
-      function getLocations3(yearf) {
+      function getNumberPoints(element1, element2, mag, yearf){
+
+        let pp = [];
+        let population = lerp(element1["properties"][mag], element2["properties"][mag], yearf%1);
+        let coordinates = element1["geometry"]["coordinates"];
+
+        let x = maxPopulation;
+
+        for(let i=5; i>=0; i--) {
+          if(population<x) {
+            pp.push(new Microsoft.Maps.Location(parseFloat(coordinates[0]) + 0.0001*(Math.random()-0.5),parseFloat(coordinates[1]) + 0.0001*(Math.random()-0.5)));
+            x = f(x);
+          }else {
+            break;
+          }
+        }
+
+        return pp;//new Promise(resolve => {resolve(pp);});
+      }
+
+      async function getLocations3(yearf) {
         let mag;
         switch (gender) {
           case 0:
@@ -146,7 +182,6 @@
 
         let y1 = Math.floor(yearf);
         let y2 = Math.ceil(yearf);
-        let pp = [];
 
         let features1 = yearsdata[y1-BASEYEAR];
         let features2 = yearsdata[y2-BASEYEAR];
@@ -154,28 +189,14 @@
         if(typeof features1 === 'undefined' || typeof features2 === 'undefined'){
           return [];
         }
-
-        let element1, element2, x;
-        for(let j = 0; j<features1["Features"].length && j<features2["Features"].length; j++) {
-          element1 = features1["Features"][j];
-          element2 = features2["Features"][j];
-
-          population = lerp(element1["properties"][mag], element2["properties"][mag], yearf%1);
-          coordinates = element1["geometry"]["coordinates"];
-
-          x = maxPopulation;
-
-          for(let i=5; i>=0; i--) {
-            if(population<x) {
-              pp.push(new Microsoft.Maps.Location(parseFloat(coordinates[0]) + 0.0001*(Math.random()-0.5),parseFloat(coordinates[1]) + 0.0001*(Math.random()-0.5)));
-              x = f(x);
-            }else {
-              break;
-            }
-          }
+        let promises = [];
+        let element1 = features1["Features"];
+        let element2 = features2["Features"];
+        for(let j = 0; j<element1.length && j<element2.length; j++) {
+          promises.push(getNumberPoints(element1[j], element2[j], mag, yearf));
         }
 
-        return pp;
+        return Promise.all(promises);
       }
     </script>
     <script type='text/javascript' src='http://www.bing.com/api/maps/mapcontrol?callback=GetMap' async defer></script>
