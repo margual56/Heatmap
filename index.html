@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>La España despoblada: heatmap</title>
+    <title>La Españita despoblada: heatmap</title>
     <meta charset="utf-8" />
     <link href="/_styles/normalize.css" rel="stylesheet" type="text/css">
     <meta name="viewport" content="width=device-width">
@@ -12,7 +12,7 @@
       let finalYear = 2018;
 
       let year = BASEYEAR;
-      let yearInterval = 0.1;
+      let yearInterval = 0.082;
       let yearIntervalOld = 0.1;
       let maxPopulation = 400;
 
@@ -26,12 +26,30 @@
       let yearsdata = [];
       let yearscount = BASEYEAR;
 
+      let months = [ "January", "February", "March", "April", "May", "June",
+           "July", "August", "September", "October", "November", "December" ];
+
       function loading(visible) {
         if (visible) {
-            document.getElementById('overlay').style.display="block";
+            document.getElementById('loadingOverlay').style.display="block";
         } else {
-            document.getElementById('overlay').style.display="none";
+            document.getElementById('loadingOverlay').style.display="none";
         }
+      }
+
+      function info(visible) {
+        if (visible) {
+            document.getElementById('infoOverlay').style.display="block";
+        } else {
+            document.getElementById('infoOverlay').style.display="none";
+        }
+      }
+
+      function updateOverlayYear(y){
+        var myDiv = document.getElementById("infoOverlay");
+        let date = months[Math.floor(12*(y%1)).toString()] + ", " + Math.floor(y).toString();
+
+        myDiv.innerHTML = date + "\n<progress id=\"progressBar\" max=\"100\" value=" + (100*(y-BASEYEAR)/(finalYear-BASEYEAR)).toString() + "></progress>";
       }
 
       function getdata(year){
@@ -49,7 +67,8 @@
         let pos = [40.098388671875, -4.043139934539795];
         var map = new Microsoft.Maps.Map('#myMap', {
           credentials: "AhDgOTA-iLKJ8ovYzesQjwB1wPIoyEYUjf6rj8wp6290h8BoHoTVSajFChVkFQV6",
-          mapTypeId: Microsoft.Maps.MapTypeId.aerial,
+          mapTypeId: Microsoft.Maps.MapTypeId.canvasDark,
+          labelOverlay: Microsoft.Maps.LabelOverlay.hidden,
           center: new Microsoft.Maps.Location(pos[0],pos[1]),
           zoom: 7,
           options: {
@@ -69,14 +88,16 @@
             {
               weight: 0.001,
               intensity: 0.1,
-              radius: 20,
+              radius: 10,
+              units: 'metres',
               aggregateLocationWeights: true
             });
 
           map.layers.insert(heatmap);
           console.log("heatmap done");
 
-          setTimeout(updatePrintout(heatmap, 1), 2000);
+          setTimeout(function(){updatePrintout(heatmap, 80);}, 1000);
+
         });
       }
 
@@ -91,29 +112,55 @@
           yearsdata.push(getdata(BASEYEAR+i));
           console.log("loaded " + (BASEYEAR+i).toString() + " in " + ((new Date().getTime()-s1)/1000).toString() + "s");
         }
-
-        console.log(yearsdata)
       }
 
       function updatePrintout(heatmap, delay){
         setTimeout(function () {
-          //console.log("Year" + time);
-          let s1 = new Date().getTime();
-          heatmap.setLocations(getLocations3(year));
-          //console.log("The year " + time + " computed in: " + ((new Date().getTime()-s1)/1000).toString() + "s");
+          //let s1 = new Date().getTime();
+          getLocations3(year).then(function(x) {
+            let points = []
+
+            for(let i = 0; i<x.length; i++){
+              points = points.concat(x[i]);
+            }
+
+            heatmap.setLocations(points);
+          });
+
+          //console.log("The year " + year + " computed in: " + ((new Date().getTime()-s1)/1000).toString() + "s");
+
+          updateOverlayYear(year);
 
           if(year+yearInterval<finalYear-yearInterval*2){
             year = year+yearInterval
-            updatePrintout(heatmap, delay);
-          }
-          else {
+          }else {
             year = BASEYEAR
-            updatePrintout(heatmap, delay);
           }
+
+          updatePrintout(heatmap, delay);
         }, delay);
       }
 
-      function getLocations3(yearf) {
+      function getNumberPoints(element1, element2, population, yearf){
+
+        let pp = [];
+        let coordinates = element1["geometry"]["coordinates"];
+
+        let x = maxPopulation;
+
+        for(let i=5; i>=0; i--) {
+          if(population<x) {
+            pp.push(new Microsoft.Maps.Location(parseFloat(coordinates[0]) + 0.0001*(Math.random()-0.5),parseFloat(coordinates[1]) + 0.0001*(Math.random()-0.5)));
+            x = f(x);
+          }else {
+            break;
+          }
+        }
+
+        return pp;
+      }
+
+      async function getLocations3(yearf) {
         let mag;
         switch (gender) {
           case 0:
@@ -134,7 +181,6 @@
 
         let y1 = Math.floor(yearf);
         let y2 = Math.ceil(yearf);
-        let pp = [];
 
         let features1 = yearsdata[y1-BASEYEAR];
         let features2 = yearsdata[y2-BASEYEAR];
@@ -142,37 +188,30 @@
         if(typeof features1 === 'undefined' || typeof features2 === 'undefined'){
           return [];
         }
+        let promises = [];
+        let element1 = features1["Features"];
+        let element2 = features2["Features"];
+        for(let j = 0; j<element1.length && j<element2.length; j++) {
+          let population = lerp(element1[j]["properties"][mag], element2[j]["properties"][mag], yearf%1);
 
-        let element1, element2, x;
-        for(let j = 0; j<features1["Features"].length && j<features2["Features"].length; j++) {
-          element1 = features1["Features"][j];
-          element2 = features2["Features"][j];
-
-          population = lerp(element1["properties"][mag], element2["properties"][mag], yearf%1);
-          coordinates = element1["geometry"]["coordinates"];
-
-          x = maxPopulation;
-
-          for(let i=5; i>=0; i--) {
-            if(population<x) {
-              pp.push(new Microsoft.Maps.Location(parseFloat(coordinates[0]) + 0.0001*(Math.random()-0.5),parseFloat(coordinates[1]) + 0.0001*(Math.random()-0.5)));
-              x = f(x);
-            }else {
-              break;
-            }
+          if(population<=maxPopulation){
+            promises.push(getNumberPoints(element1[j], element2[j], population, yearf));
           }
         }
 
-        return pp;
+        return Promise.all(promises);
       }
     </script>
     <script type='text/javascript' src='http://www.bing.com/api/maps/mapcontrol?callback=GetMap' async defer></script>
 </head>
 <body>
     <div id="myMap"></div>
-    <div id="overlay" style="color:black; font-weight: bold;position:absolute;width:100%;height:100%; background-color: white; opacity:0.73; text-align: center;">
+    <div id="loadingOverlay">
         <br /><br /><br /><br /><br />
         Loading...
+    </div>
+    <div id="infoOverlay">
+      <progress id="progressBar" max="100" value="0"></progress>
     </div>
 </body>
 </html>
