@@ -150,12 +150,15 @@
         }, delay);
       }
 
-      function getNumberPoints(element1, element2, population, yearf){
+      function getNumberPoints(element1, element2, population, yearf, mag){
 
         let pp = [];
         let coordinates = element1["geometry"]["coordinates"];
 
         let x = maxPopulation;
+
+        if(mag != "total")
+          x /= 2;
 
         for(let i=5; i>=0; i--) {
           if(population<x) {
@@ -201,7 +204,7 @@
         let element1 = features1["Features"];
         let element2 = features2["Features"];
         for(let j = 0; j<element1.length && j<element2.length; j++) {
-          let population = lerp(element1[j]["properties"][mag], element2[j]["properties"][mag], yearf%1);
+          let population = lerp(element1[j]["properties"][mag], element2[j]["properties"][mag], yearf%1, mag);
 
           if(population<=maxPopulation){
             promises.push(getNumberPoints(element1[j], element2[j], population, yearf));
@@ -223,9 +226,18 @@
       <progress id="progressBar" max="100" value="0"></progress>
     </div>
     <div id="genderSelect">
-      <input type="radio" name="gender" id="Both" checked=true>Both
-      <br><input type="radio" name="gender" id="Male">Male
-      <br><input type="radio" name="gender" id="Female">Female
+      <label class="container">Both
+        <input type="radio" checked="checked" name="radio" id="Both">
+        <span class="checkmark"></span>
+      </label>
+      <label class="container">Male
+        <input type="radio" name="radio" id="Male">
+        <span class="checkmark"></span>
+      </label>
+      <label class="container">Female
+        <input type="radio" name="radio" id="Female">
+        <span class="checkmark"></span>
+      </label>
     </div>
 </body>
 </html>
