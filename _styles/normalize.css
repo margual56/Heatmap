@@ -20,18 +20,27 @@
   text-shadow: 5px;
   font-weight: bold;
   color: #fff;
+}
 
+#genderSelect{
+  position: absolute;
+  width:170px;
+  height:70px;
 
-  /*
-  background-color:rgba(0, 0, 0, 0.5);
-  border: 3px solid #c3c3c3;
-  position:absolute;
-  background-color: black;
-  opacity:0.3;
-  align-content: center;
+  background-color:rgba(0, 0, 0, 0.75);
+  border: 5px;
+  border-color: #fc6b03;
+  border-style: groove;
+
+  margin-left: 5px;
+  margin-top: 90px;
+  padding-left: 40px;
+  padding-top: 15px;
+
   text-align: left;
-  padding-left: 10px;
-  padding-top: 7.5px;*/
+  text-overflow: clip;
+  text-shadow: 5px;
+  font-weight: bold;
 }
 
 #loadingOverlay{
