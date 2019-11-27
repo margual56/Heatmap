@@ -16,13 +16,6 @@
       let yearIntervalOld = 0.1;
       let maxPopulation = 400;
 
-      /*
-        gender = 0 -> total
-        gender = 1 -> men
-        gender = 2 -> woman
-      */
-      let gender = 0;
-
       let yearsdata = [];
       let yearscount = BASEYEAR;
 
@@ -52,6 +45,20 @@
         myDiv.innerHTML = date + "\n<progress id=\"progressBar\" max=\"100\" value=" + (100*(y-BASEYEAR)/(finalYear-BASEYEAR)).toString() + "></progress>";
       }
 
+      function getGender(){
+        let both = document.getElementById("Both").checked;
+        let male = document.getElementById("Male").checked;
+        let female = document.getElementById("Female").checked;
+
+        /*
+          gender = 0 -> total
+          gender = 1 -> men
+          gender = 2 -> woman
+        */
+
+        return both * 0 + male * 1 + female * 2;
+      }
+
       function getdata(year){
         var httpr = new XMLHttpRequest();
         httpr.open("GET", "INEdata/Poblacion" + year + ".json", false);
@@ -77,6 +84,8 @@
             "liteMode": true
           }
         });
+
+        console.log(getGender());
 
         loading(true)
         download();
@@ -162,7 +171,7 @@
 
       async function getLocations3(yearf) {
         let mag;
-        switch (gender) {
+        switch (getGender()) {
           case 0:
             mag = "total";
           break;
@@ -212,6 +221,11 @@
     </div>
     <div id="infoOverlay">
       <progress id="progressBar" max="100" value="0"></progress>
+    </div>
+    <div id="genderSelect">
+      <input type="radio" name="gender" id="Both" checked=true>Both
+      <br><input type="radio" name="gender" id="Male">Male
+      <br><input type="radio" name="gender" id="Female">Female
     </div>
 </body>
 </html>
