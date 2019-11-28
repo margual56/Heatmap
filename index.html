@@ -7,6 +7,11 @@
     <meta name="viewport" content="width=device-width">
 </head>
 <body>
+    <script type='text/javascript'>
+      Number.prototype.round = function(places) {
+        return +(Math.round(this + "e+" + places)  + "e-" + places);
+      }
+    </script>
     <script type='text/javascript' src='scripts/getData.js'></script>
     <script type='text/javascript' src='scripts/GUI.js'></script>
     <script type='text/javascript' src='scripts/map.js'></script>
@@ -22,15 +27,15 @@
     </div>
     <div id="genderSelect">
       <label class="container">Both
-        <input type="radio" checked="checked" name="radio" id="Both">
+        <input type="radio" checked="checked" name="radio" id="Both" onchange="changeGender()">
         <span class="checkmark"></span>
       </label>
       <label class="container">Male
-        <input type="radio" name="radio" id="Male">
+        <input type="radio" name="radio" id="Male" onchange="changeGender()">
         <span class="checkmark"></span>
       </label>
       <label class="container">Female
-        <input type="radio" name="radio" id="Female">
+        <input type="radio" name="radio" id="Female" onchange="changeGender()">
         <span class="checkmark"></span>
       </label>
     </div>

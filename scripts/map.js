@@ -12,6 +12,10 @@ let yearscount = BASEYEAR;
 let months = [ "January", "February", "March", "April", "May", "June",
      "July", "August", "September", "October", "November", "December" ];
 
+let gender = 0;
+
+let pointsCache = {};
+
 function f(x){
  return Math.pow(x, 4)/1500000000+100;
 }
@@ -61,16 +65,34 @@ function GetMap() {
 
 function updatePrintout(heatmap, delay){
   setTimeout(function () {
-    //let s1 = new Date().getTime();
-    getLocations3(year).then(function(x) {
-      let points = []
+    let s1 = new Date().getTime();
 
-      for(let i = 0; i<x.length; i++){
-        points = points.concat(x[i]);
-      }
+    //I have observed exactly the same times in one case or another. It seems unlikely
+    //that all the processing of the points takes the same as loading from memory.
+    //Maybe using the localStorage (native cache)... but it only stores strings.
+    //Therefore, I must convert the array to a string and then, when reading it,
+    //cast it to an array again... then, maybe the time will be better(?) not likely
 
-      heatmap.setLocations(points);
-    });
+    //HOWEVER, I must make an observation: the fps have dropped a big deal since I started...
+    //Maybe it was better before? I must check.
+
+    let key = year.round(4).toString();
+    if(!(key in pointsCache)){
+      getLocations3(year).then(function(x) {
+        let points = []
+
+        for(let i = 0; i<x.length; i++){
+          points = points.concat(x[i]);
+        }
+
+        heatmap.setLocations(points);
+        pointsCache[key] = points;
+        console.log("Cached year " + key + ", and loaded in " + ((new Date().getTime()-s1)/1000).toString() + "s");
+      });
+    }else{
+      heatmap.setLocations(pointsCache[key]);
+      console.log("Loaded year " + key + " from cache in " + ((new Date().getTime()-s1)/1000).toString() + "s");
+    }
 
     //console.log("The year " + year + " computed in: " + ((new Date().getTime()-s1)/1000).toString() + "s");
 
@@ -80,6 +102,7 @@ function updatePrintout(heatmap, delay){
       year = year+yearInterval;
     }else {
       year = BASEYEAR;
+      cacheDone = true;
     }
 
     updatePrintout(heatmap, delay);
@@ -110,7 +133,7 @@ function getNumberPoints(element1, element2, population, yearf, mag){
 
 async function getLocations3(yearf) {
   let mag;
-  switch (getGender()) {
+  switch (gender){
     case 0:
       mag = "total";
     break;
@@ -151,7 +174,9 @@ async function getLocations3(yearf) {
   return Promise.all(promises);
 }
 
-function getGender(){
+function changeGender(){
+  pointsCache = {};
+
   let both = document.getElementById("Both").checked;
   let male = document.getElementById("Male").checked;
   let female = document.getElementById("Female").checked;
@@ -162,5 +187,7 @@ function getGender(){
     gender = 2 -> woman
   */
 
-  return both * 0 + male * 1 + female * 2;
+  gender = both * 0 + male * 1 + female * 2;
+
+  return gender;
 }
