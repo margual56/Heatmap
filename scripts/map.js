@@ -26,41 +26,25 @@ function lerp(a, b, f){
 }
 
 function GetMap() {
-  let pos = [40.098388671875, -4.043139934539795];
-  var map = new Microsoft.Maps.Map('#myMap', {
-    credentials: "AhDgOTA-iLKJ8ovYzesQjwB1wPIoyEYUjf6rj8wp6290h8BoHoTVSajFChVkFQV6",
-    mapTypeId: Microsoft.Maps.MapTypeId.canvasDark,
-    labelOverlay: Microsoft.Maps.LabelOverlay.hidden,
-    center: new Microsoft.Maps.Location(pos[0],pos[1]),
-    zoom: 7,
-    options: {
-      "allowHidingLabelsOfRoad": true,
-      "enableClickableLogo": false,
-      "liteMode": true
-    }
+  let startingPoint = new google.maps.LatLng(40.098388671875, -4.043139934539795);
+
+  loading(false);
+  var map = new google.maps.Map(document.getElementById('map'), {
+    center: startingPoint,
+    zoom: 13,
+    mapTypeId: 'satellite'
   });
 
-  loading(true)
+  /*loading(true)
   download();
   loading(false)
 
-  Microsoft.Maps.loadModule(['Microsoft.Maps.GeoJson', 'Microsoft.Maps.HeatMap'], function () {
-    let shapes = [new Microsoft.Maps.Location(0,0)];
-    var heatmap = new Microsoft.Maps.HeatMapLayer(shapes,
-      {
-        weight: 0.001,
-        intensity: 0.1,
-        radius: 10,
-        units: 'metres',
-        aggregateLocationWeights: true
-      });
-
-    map.layers.insert(heatmap);
-    console.log("heatmap done");
-
-    setTimeout(function(){updatePrintout(heatmap, 50);}, 500);
-
+  var heatmap = new google.maps.visualization.HeatmapLayer({
+    data: heatmapData
   });
+  heatmap.setMap(map);
+
+  setTimeout(function(){updatePrintout(heatmap, 50);}, 500);*/
 }
 
 function updatePrintout(heatmap, delay){
