@@ -5,18 +5,17 @@
     <meta charset="utf-8" />
     <link href="/_styles/normalize.css" rel="stylesheet" type="text/css">
     <meta name="viewport" content="width=device-width">
-</head>
-<body>
     <script type='text/javascript'>
       Number.prototype.round = function(places) {
         return +(Math.round(this + "e+" + places)  + "e-" + places);
       }
     </script>
-    <script type='text/javascript' src='scripts/getData.js'></script>
-    <script type='text/javascript' src='scripts/GUI.js'></script>
-    <script type='text/javascript' src='scripts/map.js'></script>
+    <script src='scripts/getData.js'></script>
+    <script src='scripts/GUI.js'></script>
+    <script src='scripts/map.js'></script>
     <script type='text/javascript' src='http://www.bing.com/api/maps/mapcontrol?callback=GetMap' async defer></script>
-
+</head>
+<body>
     <div id="myMap"></div>
     <div id="loadingOverlay">
         <br /><br /><br /><br /><br />

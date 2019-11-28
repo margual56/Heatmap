@@ -2,7 +2,7 @@ let BASEYEAR = 1999;
 let finalYear = 2018;
 
 let year = BASEYEAR;
-let yearInterval = 0.082;
+let yearInterval = 0.05;
 let yearIntervalOld = 0.1;
 let maxPopulation = 400;
 
@@ -15,6 +15,7 @@ let months = [ "January", "February", "March", "April", "May", "June",
 let gender = 0;
 
 let pointsCache = {};
+let sumS = 0;
 
 function f(x){
  return Math.pow(x, 4)/1500000000+100;
@@ -23,7 +24,6 @@ function f(x){
 function lerp(a, b, f){
  return  (a * (1.0 - f)) + (b * f);
 }
-
 
 function GetMap() {
   let pos = [40.098388671875, -4.043139934539795];
@@ -58,7 +58,7 @@ function GetMap() {
     map.layers.insert(heatmap);
     console.log("heatmap done");
 
-    setTimeout(function(){updatePrintout(heatmap, 80);}, 1000);
+    setTimeout(function(){updatePrintout(heatmap, 50);}, 500);
 
   });
 }
@@ -78,7 +78,25 @@ function updatePrintout(heatmap, delay){
 
     let key = year.round(4).toString();
     if(!(key in pointsCache)){
-      getLocations3(year).then(function(x) {
+        let mag;
+        switch (gender){
+          case 0:
+            mag = "total";
+          break;
+
+          case 1:
+            mag = "hombres";
+          break;
+
+          case 2:
+            mag = "mujeres";
+          break;
+
+          default:
+            mag = "total";
+        }
+
+      getLocations3(year, mag).then(function(x) {
         let points = []
 
         for(let i = 0; i<x.length; i++){
@@ -87,12 +105,15 @@ function updatePrintout(heatmap, delay){
 
         heatmap.setLocations(points);
         pointsCache[key] = points;
-        console.log("Cached year " + key + ", and loaded in " + ((new Date().getTime()-s1)/1000).toString() + "s");
+        sumS += (new Date().getTime()-s1)/1000;
+        //console.log("Cached year " + key + ", and loaded in " + ((new Date().getTime()-s1)/1000).toString() + "s");
       });
     }else{
       heatmap.setLocations(pointsCache[key]);
-      console.log("Loaded year " + key + " from cache in " + ((new Date().getTime()-s1)/1000).toString() + "s");
+      sumS += (new Date().getTime()-s1)/1000;
+      //console.log("Loaded year " + key + " from cache in " + ((new Date().getTime()-s1)/1000).toString() + "s");
     }
+
 
     //console.log("The year " + year + " computed in: " + ((new Date().getTime()-s1)/1000).toString() + "s");
 
@@ -101,6 +122,9 @@ function updatePrintout(heatmap, delay){
     if(year+yearInterval<finalYear-yearInterval*2){
       year = year+yearInterval;
     }else {
+      console.log("AVERAGE LOAD TIME: " + ((sumS/((finalYear-BASEYEAR)/yearInterval))*1000).round(4).toString() + "ms");
+
+      sumS = 0;
       year = BASEYEAR;
       cacheDone = true;
     }
@@ -109,7 +133,7 @@ function updatePrintout(heatmap, delay){
   }, delay);
 }
 
-function getNumberPoints(element1, element2, population, yearf, mag){
+async function getNumberPoints(element1, element2, population, yearf, mag){
 
   let pp = [];
   let coordinates = element1["geometry"]["coordinates"];
@@ -131,25 +155,7 @@ function getNumberPoints(element1, element2, population, yearf, mag){
   return pp;
 }
 
-async function getLocations3(yearf) {
-  let mag;
-  switch (gender){
-    case 0:
-      mag = "total";
-    break;
-
-    case 1:
-      mag = "hombres";
-    break;
-
-    case 2:
-      mag = "mujeres";
-    break;
-
-    default:
-      mag = "total";
-  }
-
+async function getLocations3(yearf, mag) {
   let y1 = Math.floor(yearf);
   let y2 = Math.ceil(yearf);
 
@@ -164,10 +170,10 @@ async function getLocations3(yearf) {
   let element2 = features2["Features"];
   let lerpValue = yearf%1;
   for(let j = 0; j<element1.length && j<element2.length; j++) {
-    let population = lerp(element1[j]["properties"][mag], element2[j]["properties"][mag], lerpValue, mag);
+    let population = lerp(element1[j]["properties"][mag], element2[j]["properties"][mag], lerpValue);
 
     if(population<=maxPopulation){
-      promises.push(getNumberPoints(element1[j], element2[j], population, yearf));
+      promises.push(getNumberPoints(element1[j], element2[j], population, yearf, mag));
     }
   }
 
