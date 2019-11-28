@@ -12,6 +12,15 @@ let yearscount = BASEYEAR;
 let months = [ "January", "February", "March", "April", "May", "June",
      "July", "August", "September", "October", "November", "December" ];
 
+function f(x){
+ return Math.pow(x, 4)/1500000000+100;
+}
+
+function lerp(a, b, f){
+ return  (a * (1.0 - f)) + (b * f);
+}
+
+
 function GetMap() {
   let pos = [40.098388671875, -4.043139934539795];
   var map = new Microsoft.Maps.Map('#myMap', {

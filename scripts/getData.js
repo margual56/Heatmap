@@ -4,7 +4,7 @@ function download() {
     s1 = new Date().getTime();
 
     getdata(BASEYEAR+i, function(response){
-      yearsdata.concat(response);
+      yearsdata.push(JSON.parse(response) );
     });
 
     console.log("loaded " + (BASEYEAR+i).toString() + " in " + ((new Date().getTime()-s1)/1000).toString() + "s");
